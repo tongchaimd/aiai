@@ -9,6 +9,7 @@ Create a simulation that exhibits these properties:
 - Obeying Newtonian mechanics
 - Containing one controllable body
 - Time navigable
+
 Create an agent that uses machine learning.
 Make the agent learns to navigate through the simulation.
 Output the progress of the agent.
