@@ -2,29 +2,54 @@
 // It holds the domain logic.
 package core
 
-// STATE0 is the initial state.
-const STATE0 = State{}
+type state interface{}
+type action interface{}
 
-var (
-	sim   = Simulation{}
-	guide = Guide{sim}
-	ai    = Agent{StateDimension: guide.EndDimension, ActionDimension: sim.ActionDimension}
-	state = STATE0
-)
+type simulation interface {
+	STATE0() interface{}
+	Simulate(current state, a action) (next state)
+}
+
+type agent interface {
+	Train()
+	Act(state) action
+}
+
+type agentConstructor interface {
+	Agent(simulation) agent
+}
+
+// Core struct holds some fields, but is not indended to be created by literal.
+type Core struct {
+	sim       simulation
+	ai        agent
+	currState state
+}
+
+// Core function is the constructor to core.
+// It initializes state to zero state, simulation implimentation, and agent implementation.
+func NewCore(simImpl simulation, agentCon agentConstructor) (obj Core) {
+	obj = Core{
+		sim:       simImpl,
+		ai:        agentCon.Agent(simImpl),
+		currState: simImpl.STATE0(),
+	}
+	return
+}
 
 // Restart sets state back to the inital state.
-func Restart() {
-	state = STATE0
+func (c *Core) Restart() {
+	c.currState = nil
 }
 
 // Step moves the simulation forward in time, and returns this next state.
-func Step() State {
-	action := ai.Act(guide.Parse(state))
-	state = sim.Simulate(state, action)
-	return state
+func (c *Core) Step() state {
+	action := c.ai.Act(c.currState)
+	c.currState = c.sim.Simulate(c.currState, action)
+	return c.currState
 }
 
 // Train forces ai to get better at its job.
-func Train() {
-	ai.Train(guide)
+func (c *Core) Train() {
+	c.ai.Train()
 }
