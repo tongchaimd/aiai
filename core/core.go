@@ -19,12 +19,12 @@ func Restart() {
 
 // Step moves the simulation forward in time, and returns this next state.
 func Step() State {
-	action := ai.Act(state)
+	action := ai.Act(guide.Parse(state))
 	state = sim.Simulate(state, action)
 	return state
 }
 
 // Train forces ai to get better at its job.
 func Train() {
-	ai.Train()
+	ai.Train(guide)
 }
