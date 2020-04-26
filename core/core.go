@@ -2,17 +2,17 @@
 // It holds the domain logic.
 package core
 
-type state interface{}
-type action interface{}
+type State interface{}
+type Action interface{}
 
 type simulation interface {
-	STATE0() interface{}
-	Simulate(current state, a action) (next state)
+	STATE0() State
+	Simulate(current State, a Action) (next State)
 }
 
 type agent interface {
 	Train()
-	Act(state) action
+	Act(State) Action
 }
 
 type agentConstructor interface {
@@ -23,7 +23,7 @@ type agentConstructor interface {
 type Core struct {
 	sim       simulation
 	ai        agent
-	currState state
+	currState State
 }
 
 // Core function is the constructor to core.
@@ -43,7 +43,7 @@ func (c *Core) Restart() {
 }
 
 // Step moves the simulation forward in time, and returns this next state.
-func (c *Core) Step() state {
+func (c *Core) Step() State {
 	action := c.ai.Act(c.currState)
 	c.currState = c.sim.Simulate(c.currState, action)
 	return c.currState
